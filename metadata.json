@@ -1,0 +1,6 @@
+{
+  "name": "宝宝识图乐园",
+  "description": "专为3岁儿童设计的互动式横版绘本识图学习软件。支持森林、海洋、动物园三大奇妙场景，切换学习与找找两种模式，配合欢乐语音读音与奖励反馈，轻松提升幼儿词汇量。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

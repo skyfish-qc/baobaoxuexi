@@ -1,4 +1,5 @@
 import java.net.URL
+import java.net.HttpURLConnection
 import java.net.URLEncoder
 import java.io.File
 import java.io.FileOutputStream
@@ -237,7 +238,82 @@ tasks.register("downloadMp3Resources") {
     }
 }
 
+tasks.register("downloadOfflineImages") {
+    doLast {
+        val drawableDir = File("./app/src/main/res/drawable")
+        if (!drawableDir.exists()) {
+            drawableDir.mkdirs()
+        }
+
+        val animalImageUrls = mapOf(
+            "panda" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f43c.png",
+            "elephant" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f418.png",
+            "lion" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f981.png",
+            "monkey" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f435.png",
+            "giraffe" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f992.png",
+            
+            "bear" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f43b.png",
+            "rabbit" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f430.png",
+            "squirrel" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f43f.png",
+            "owl" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f989.png",
+            "deer" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f98c.png",
+            
+            "dolphin" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f42c.png",
+            "whale" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f433.png",
+            "octopus" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f419.png",
+            "starfish" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u2b50.png",
+            "turtle" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f422.png",
+            
+            "ryder" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f466.png",
+            "chase" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f415.png",
+            "marshall" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f429.png",
+            "skye" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f436.png",
+            "rubble" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f9ae.png"
+        )
+
+        println("Offline animal image pre-cache running: preparing ${animalImageUrls.size} files in src/main/res/drawable/")
+        for ((id, urlStr) in animalImageUrls) {
+            val outFile = File(drawableDir, "img_animal_$id.png")
+            if (outFile.exists() && outFile.length() > 0) {
+                continue
+            }
+            var input: InputStream? = null
+            var output: OutputStream? = null
+            try {
+                val url = URL(urlStr)
+                val conn = url.openConnection() as HttpURLConnection
+                conn.connectTimeout = 15000
+                conn.readTimeout = 15000
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                conn.useCaches = false
+                
+                val status = conn.responseCode
+                if (status >= 400) {
+                    System.err.println("Warning: failed to download image for $id: Server returned HTTP " + status)
+                    continue
+                }
+                
+                input = conn.inputStream
+                output = FileOutputStream(outFile)
+                val buffer = ByteArray(4096)
+                var bytesRead = input.read(buffer)
+                while (bytesRead != -1) {
+                    output?.write(buffer, 0, bytesRead)
+                    bytesRead = input.read(buffer)
+                }
+                println("Pre-fetched PNG: drawable/img_animal_$id.png")
+            } catch (e: Exception) {
+                System.err.println("Warning: failed to download image for $id: ${e.message}")
+            } finally {
+                try { input?.close() } catch (ignored: Exception) {}
+                try { output?.close() } catch (ignored: Exception) {}
+            }
+        }
+    }
+}
+
 tasks.named("preBuild") {
     dependsOn("downloadMp3Resources")
+    dependsOn("downloadOfflineImages")
 }
 

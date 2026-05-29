@@ -1,5 +1,7 @@
 package com.example.model
 
+import com.example.R
+
 enum class SceneType(val displayName: String, val bgResName: String) {
     ZOO("开心动物园", "img_bg_zoo"),
     FOREST("奇妙大森林", "img_bg_forest"),
@@ -246,31 +248,31 @@ object SceneData {
     }
 }
 
-val Animal.imageUrl: String
+val Animal.imageResId: Int
     get() = when (id) {
-        "panda" -> "https://img.icons8.com/color/144/panda.png"
-        "elephant" -> "https://img.icons8.com/color/144/elephant.png"
-        "lion" -> "https://img.icons8.com/color/144/lion.png"
-        "monkey" -> "https://img.icons8.com/color/144/monkey.png"
-        "giraffe" -> "https://img.icons8.com/color/144/giraffe.png"
+        "panda" -> R.drawable.img_animal_panda
+        "elephant" -> R.drawable.img_animal_elephant
+        "lion" -> R.drawable.img_animal_lion
+        "monkey" -> R.drawable.img_animal_monkey
+        "giraffe" -> R.drawable.img_animal_giraffe
         
-        "bear" -> "https://img.icons8.com/color/144/bear.png"
-        "rabbit" -> "https://img.icons8.com/color/144/rabbit.png"
-        "squirrel" -> "https://img.icons8.com/color/144/squirrel.png"
-        "owl" -> "https://img.icons8.com/color/144/owl.png"
-        "deer" -> "https://img.icons8.com/color/144/deer.png"
+        "bear" -> R.drawable.img_animal_bear
+        "rabbit" -> R.drawable.img_animal_rabbit
+        "squirrel" -> R.drawable.img_animal_squirrel
+        "owl" -> R.drawable.img_animal_owl
+        "deer" -> R.drawable.img_animal_deer
         
-        "dolphin" -> "https://img.icons8.com/color/144/dolphin.png"
-        "whale" -> "https://img.icons8.com/color/144/whale.png"
-        "octopus" -> "https://img.icons8.com/color/144/octopus.png"
-        "starfish" -> "https://img.icons8.com/color/144/starfish.png"
-        "turtle" -> "https://img.icons8.com/color/144/sea-turtle.png"
+        "dolphin" -> R.drawable.img_animal_dolphin
+        "whale" -> R.drawable.img_animal_whale
+        "octopus" -> R.drawable.img_animal_octopus
+        "starfish" -> R.drawable.img_animal_starfish
+        "turtle" -> R.drawable.img_animal_turtle
         
-        "ryder" -> "https://img.icons8.com/color/144/school-boy.png"
-        "chase" -> "https://img.icons8.com/color/144/police-dog.png"
-        "marshall" -> "https://img.icons8.com/color/144/dalmatian.png"
-        "skye" -> "https://img.icons8.com/color/144/spaniel.png"
-        "rubble" -> "https://img.icons8.com/color/144/bulldog.png"
-        else -> ""
+        "ryder" -> R.drawable.img_animal_ryder
+        "chase" -> R.drawable.img_animal_chase
+        "marshall" -> R.drawable.img_animal_marshall
+        "skye" -> R.drawable.img_animal_skye
+        "rubble" -> R.drawable.img_animal_rubble
+        else -> 0
     }
 

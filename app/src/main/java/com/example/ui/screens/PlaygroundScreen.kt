@@ -34,19 +34,42 @@ import com.example.model.Animal
 import com.example.model.GameMode
 import com.example.model.SceneData
 import com.example.model.SceneType
-import com.example.model.imageUrl
-import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
+import com.example.model.imageResId
 import com.example.viewmodel.LearningEvent
 import com.example.viewmodel.LearningViewModel
 import com.example.viewmodel.ScreenType
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 
 // Beautiful colors for playground UI details
 val SoftMint = Color(0xFF06D6A0)
 val SoftCyanLight = Color(0xFFE0FAFF)
+
+@Composable
+fun AnimalImage(
+    animal: Animal,
+    size: Dp,
+    emojiSize: TextUnit,
+    modifier: Modifier = Modifier
+) {
+    if (animal.imageResId != 0) {
+        Image(
+            painter = painterResource(id = animal.imageResId),
+            contentDescription = animal.name,
+            modifier = modifier.size(size),
+            contentScale = ContentScale.Fit
+        )
+    } else {
+        Text(
+            text = animal.emoji,
+            fontSize = emojiSize,
+            textAlign = TextAlign.Center,
+            modifier = modifier
+        )
+    }
+}
 
 data class Particle(
     var x: Float,
@@ -159,35 +182,11 @@ fun PlaygroundScreen(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        if (animal.imageUrl.isNotEmpty()) {
-                            val painter = rememberAsyncImagePainter(model = animal.imageUrl)
-                            val state = painter.state
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.size(52.dp)
-                            ) {
-                                Image(
-                                    painter = painter,
-                                    contentDescription = animal.name,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Fit
-                                )
-                                // If loading or has error, overlay or show the emoji as fallback
-                                if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
-                                    Text(
-                                        text = animal.emoji,
-                                        fontSize = 32.sp,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                        } else {
-                            Text(
-                                text = animal.emoji,
-                                fontSize = 32.sp,
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                        AnimalImage(
+                            animal = animal,
+                            size = 52.dp,
+                            emojiSize = 32.sp
+                        )
                     }
                 }
 
@@ -471,30 +470,15 @@ fun PlaygroundScreen(
                                 .background(SoftMint.copy(alpha = 0.15f), CircleShape)
                         ) {
                             val target = targetAnimal
-                            if (target != null && target.imageUrl.isNotEmpty()) {
-                                val painter = rememberAsyncImagePainter(model = target.imageUrl)
-                                val state = painter.state
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier.size(72.dp)
-                                ) {
-                                    Image(
-                                        painter = painter,
-                                        contentDescription = target.name,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Fit
-                                    )
-                                    if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
-                                        Text(
-                                            text = target.emoji,
-                                            fontSize = 52.sp,
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
+                            if (target != null) {
+                                AnimalImage(
+                                    animal = target,
+                                    size = 72.dp,
+                                    emojiSize = 52.sp
+                                )
                             } else {
                                 Text(
-                                    text = targetAnimal?.emoji ?: "⭐",
+                                    text = "⭐",
                                     fontSize = 56.sp
                                 )
                             }
@@ -550,34 +534,11 @@ fun PlaygroundScreen(
                                 .background(SoftCyanLight, RoundedCornerShape(20.dp))
                                 .padding(12.dp)
                         ) {
-                            if (animal.imageUrl.isNotEmpty()) {
-                                val painter = rememberAsyncImagePainter(model = animal.imageUrl)
-                                val state = painter.state
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier.size(80.dp)
-                                ) {
-                                    Image(
-                                        painter = painter,
-                                        contentDescription = animal.name,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Fit
-                                    )
-                                    if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
-                                        Text(
-                                            text = animal.emoji,
-                                            fontSize = 64.sp,
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
-                            } else {
-                                Text(
-                                    text = animal.emoji,
-                                    fontSize = 64.sp,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
+                            AnimalImage(
+                                animal = animal,
+                                size = 80.dp,
+                                emojiSize = 64.sp
+                            )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = animal.name,

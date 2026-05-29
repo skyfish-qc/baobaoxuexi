@@ -264,11 +264,11 @@ tasks.register("downloadOfflineImages") {
             "starfish" to "https://images.unsplash.com/photo-1546026423-cc4642628d2b?auto=format&fit=crop&w=350&h=350&q=80",
             "turtle" to "https://images.unsplash.com/photo-1559583985-c80d8ad9b29f?auto=format&fit=crop&w=350&h=350&q=80",
             
-            "ryder" to "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=350&h=350&q=80",
-            "chase" to "https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&w=350&h=350&q=80",
-            "marshall" to "https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=350&h=350&q=80",
-            "skye" to "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=350&h=350&q=80",
-            "rubble" to "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=350&h=350&q=80"
+            "ryder" to "https://static.wikia.nocookie.net/paw-patrol/images/f/f4/Ryder.png",
+            "chase" to "https://static.wikia.nocookie.net/paw-patrol/images/c/c2/Chase.png",
+            "marshall" to "https://static.wikia.nocookie.net/paw-patrol/images/7/71/Marshall.png",
+            "skye" to "https://static.wikia.nocookie.net/paw-patrol/images/a/ae/Skye.png",
+            "rubble" to "https://static.wikia.nocookie.net/paw-patrol/images/1/14/Rubble.png"
         )
 
         println("Offline animal image pre-cache running: preparing ${animalImageUrls.size} files in src/main/res/drawable/")

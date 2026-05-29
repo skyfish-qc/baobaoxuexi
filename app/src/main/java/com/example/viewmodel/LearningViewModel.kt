@@ -6,11 +6,10 @@ import com.example.model.Animal
 import com.example.model.GameMode
 import com.example.model.SceneData
 import com.example.model.SceneType
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 sealed interface LearningEvent {
@@ -59,14 +58,15 @@ class LearningViewModel(
     private val _isMute = MutableStateFlow(false)
     val isMute: StateFlow<Boolean> = _isMute.asStateFlow()
 
-    // Event output channel for Speech and Audio triggers
-    private val _eventChannel = Channel<LearningEvent>(Channel.BUFFERED)
-    val eventFlow = _eventChannel.receiveAsFlow()
+    // Event output flow for Speech and Audio triggers
+    private val _eventFlow = kotlinx.coroutines.flow.MutableSharedFlow<LearningEvent>(
+        extraBufferCapacity = 64,
+        onBufferOverflow = kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+    )
+    val eventFlow = _eventFlow.asSharedFlow()
 
     fun triggerEvent(event: LearningEvent) {
-        viewModelScope.launch {
-            _eventChannel.send(event)
-        }
+        _eventFlow.tryEmit(event)
     }
 
     fun setMute(mute: Boolean) {

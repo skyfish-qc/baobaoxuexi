@@ -27,6 +27,131 @@ class KidsSoundEngine(private val context: Context) {
         }
     }
 
+    // Map of normalized sentence -> raw resource name
+    private val offlineSoundResources: Map<String, String> by lazy {
+        val map = java.util.HashMap<String, String>()
+        
+        fun add(id: String, text: String) {
+            val normal = text.replace(Regex("[^a-zA-Z0-9\\u4e00-\\u9fa5]"), "").lowercase()
+            map[normal] = id
+        }
+
+        // Add System / UI Phrases
+        add("welcome_btn", "欢迎来到宝宝识图乐园！点击大按钮开始玩耍吧！")
+        add("welcome_btn_below", "欢迎来到宝宝识图乐园！点击下面的大按钮开始玩耍吧！")
+        add("scene_select_intro", "小朋友，请选择一个奇妙的世界开始探索吧！有动物园、大森林和海洋世界哦！")
+        add("zoo_enter", "欢迎来到开心动物园！")
+        add("forest_enter", "欢迎来到奇妙大森林！")
+        add("ocean_enter", "欢迎来到梦幻大海洋！")
+        add("mode_learning_intro", "现在是学习宝典模式。点击画面中可爱的小家伙，学习他们的名字 and 有趣知识吧！")
+        add("mode_learning_action", "进入学习宝典模式！指一指画面上的小动物，听听他们有什么秘密吧！")
+        add("mode_find_action", "进入找一找小游戏！准备好了吗？")
+
+        // Add animals: id, name, pinyin, english, funFact
+        val animals = listOf(
+            listOf("panda", "熊猫", "xióng māo", "Panda", "大熊猫最喜欢吃香甜脆爽的竹子，胖嘟嘟的超级可爱哦！"),
+            listOf("elephant", "大象", "dà xiàng", "Elephant", "大象有一根神奇的长鼻子，能吸水给自己洗澡喷泉呢！"),
+            listOf("lion", "狮子", "shī zi", "Lion", "狮子是森林草原之王，他笑起来嗷呜一声，超级威风！"),
+            listOf("monkey", "猴子", "hóu zi", "Monkey", "小猴子是个攀爬小能手，最喜欢在树上荡秋千吃香蕉！"),
+            listOf("giraffe", "长颈鹿", "cháng jǐng lù", "Giraffe", "长颈鹿的脖子特别特别长，能轻松吃到大树顶上最嫩的绿叶！"),
+            listOf("bear", "大熊", "dà xióng", "Bear", "大熊毛茸茸的，冬天会躲在温暖的树洞里睡一个大懒觉！"),
+            listOf("rabbit", "兔子", "tù zi", "Rabbit", "小兔子长着长长的耳朵、红红的眼睛，最爱吃甜甜的胡萝卜！"),
+            listOf("squirrel", "松鼠", "sōng shǔ", "Squirrel", "小松鼠有一条蓬松的大尾巴，喜欢到各处收集好吃的松果！"),
+            listOf("owl", "猫头鹰", "māo tóu yīng", "Owl", "猫头鹰是大森林的夜间卫士，在黑夜里眼睛会闪闪发光！"),
+            listOf("deer", "小鹿", "xiǎo lù", "Deer", "小鹿身上有美丽的斑点，跑起步来轻悄悄，又快又优美！"),
+            listOf("dolphin", "海豚", "hǎi tún", "Dolphin", "小海豚最喜欢在海浪里跳舞，是海洋里最爱笑的小天使！"),
+            listOf("whale", "鲸鱼", "jīng yú", "Whale", "大蓝鲸是海洋里最大的巨无霸，头顶会喷出好高的小喷泉！"),
+            listOf("octopus", "章鱼", "zhāng yú", "Octopus", "章鱼小八有八只长长的小脚丫，生气的时候能喷出黑黑的墨汁！"),
+            listOf("starfish", "海星", "hǎi xīng", "Starfish", "亮晶晶的海星就像是掉落在神秘海底夜空里的小星星！"),
+            listOf("turtle", "海龟", "hǎi guī", "Turtle", "海龟背着厚厚重重的安全壳，在大海里划水游泳，像飞翔一样！")
+        )
+
+        for (a in animals) {
+            val id = a[0]
+            val name = a[1]
+            val pinyin = a[2]
+            val english = a[3]
+            val funFact = a[4]
+
+            add("${id}_fact", "${name}！拼写是：${pinyin}。英文叫 ${english}。${funFact}")
+            add("${id}_find", "请帮我找一找：${name}在哪里呢？")
+            add("${id}_found", "哇！你太棒啦！成功找到了 ${name}！奖励一颗亮闪闪的小星星！")
+            add("${id}_incorrect", "不对哦，那是${name}。")
+            add("${id}_search_suffix", "再仔细找一找：${name}藏在哪里啦？")
+            add("${id}_repronounce", "在哪里呢？再听一次：请帮我找一找${name}")
+        }
+        
+        map
+    }
+
+    private fun playSequentialResources(resId1: Int, resId2: Int) {
+        soundScope.launch {
+            synchronized(this@KidsSoundEngine) {
+                stopPlaybackInternal()
+                try {
+                    val player1 = MediaPlayer.create(context, resId1)
+                    currentMediaPlayer = player1
+                    player1.setOnCompletionListener {
+                        player1.release()
+                        soundScope.launch {
+                            synchronized(this@KidsSoundEngine) {
+                                try {
+                                    val player2 = MediaPlayer.create(context, resId2)
+                                    currentMediaPlayer = player2
+                                    player2.setOnCompletionListener {
+                                        player2.release()
+                                        synchronized(this@KidsSoundEngine) {
+                                            if (currentMediaPlayer == player2) {
+                                                currentMediaPlayer = null
+                                            }
+                                        }
+                                    }
+                                    player2.start()
+                                } catch (e: Exception) {
+                                    Log.e("KidsSoundEngine", "Error playing second sequence: ${e.message}")
+                                }
+                            }
+                        }
+                    }
+                    player1.start()
+                } catch (e: Exception) {
+                    Log.e("KidsSoundEngine", "Error playing first sequence: ${e.message}")
+                }
+            }
+        }
+    }
+
+    private fun playRawResource(resName: String, fbToneFreq: Double, fbToneDuration: Int) {
+        val resId = context.resources.getIdentifier(resName, "raw", context.packageName)
+        if (resId != 0) {
+            soundScope.launch {
+                synchronized(this@KidsSoundEngine) {
+                    stopPlaybackInternal()
+                    try {
+                        val player = MediaPlayer.create(context, resId)
+                        currentMediaPlayer = player
+                        player.setOnCompletionListener {
+                            player.release()
+                            synchronized(this@KidsSoundEngine) {
+                                if (currentMediaPlayer == player) {
+                                    currentMediaPlayer = null
+                                }
+                            }
+                        }
+                        player.start()
+                    } catch (e: Exception) {
+                        Log.e("KidsSoundEngine", "Error playing raw effect $resName: ${e.message}")
+                        playTone(fbToneFreq, fbToneDuration)
+                    }
+                }
+            }
+        } else {
+            soundScope.launch {
+                playTone(fbToneFreq, fbToneDuration)
+            }
+        }
+    }
+
     /**
      * MD5 Hashing helper to generate uniquely recognizable, clean file keys for text sentences.
      */
@@ -75,6 +200,67 @@ class KidsSoundEngine(private val context: Context) {
     fun speak(text: String, stopPrevious: Boolean = true) {
         if (isMute) return
 
+        // 1. Detect and parse "Incorrect" combinations dynamically
+        if (text.startsWith("不对哦")) {
+            val animalList = listOf(
+                "panda" to "熊猫", "elephant" to "大象", "lion" to "狮子", "monkey" to "猴子", "giraffe" to "长颈鹿",
+                "bear" to "大熊", "rabbit" to "兔子", "squirrel" to "松鼠", "owl" to "猫头鹰", "deer" to "小鹿",
+                "dolphin" to "海豚", "whale" to "鲸鱼", "octopus" to "章鱼", "starfish" to "海星", "turtle" to "海龟"
+            )
+            val parts = text.split("再仔细找一找")
+            if (parts.size >= 2) {
+                val firstPart = parts[0]
+                val secondPart = parts[1]
+                
+                val animal1 = animalList.firstOrNull { firstPart.contains(it.second) }?.first
+                val animal2 = animalList.firstOrNull { secondPart.contains(it.second) }?.first
+                
+                if (animal1 != null && animal2 != null) {
+                    val res1Name = "${animal1}_incorrect"
+                    val res2Name = "${animal2}_search_suffix"
+                    val resId1 = context.resources.getIdentifier(res1Name, "raw", context.packageName)
+                    val resId2 = context.resources.getIdentifier(res2Name, "raw", context.packageName)
+                    if (resId1 != 0 && resId2 != 0) {
+                        playSequentialResources(resId1, resId2)
+                        return
+                    }
+                }
+            }
+        }
+
+        // 2. Standard Offline mapping matching
+        val normalizedInput = text.replace(Regex("[^a-zA-Z0-9\\u4e00-\\u9fa5]"), "").lowercase()
+        val offlineResName = offlineSoundResources[normalizedInput]
+        if (offlineResName != null) {
+            val resId = context.resources.getIdentifier(offlineResName, "raw", context.packageName)
+            if (resId != 0) {
+                soundScope.launch {
+                    synchronized(this@KidsSoundEngine) {
+                        if (stopPrevious) {
+                            stopPlaybackInternal()
+                        }
+                        try {
+                            val player = MediaPlayer.create(context, resId)
+                            currentMediaPlayer = player
+                            player.setOnCompletionListener {
+                                player.release()
+                                synchronized(this@KidsSoundEngine) {
+                                    if (currentMediaPlayer == player) {
+                                        currentMediaPlayer = null
+                                    }
+                                }
+                            }
+                            player.start()
+                        } catch (e: Exception) {
+                            Log.e("KidsSoundEngine", "Error playing offline resource: ${e.message}")
+                        }
+                    }
+                }
+                return
+            }
+        }
+
+        // 3. Fallback cache/network check
         soundScope.launch {
             if (stopPrevious) {
                 stopPlaybackInternal()
@@ -166,37 +352,27 @@ class KidsSoundEngine(private val context: Context) {
     }
 
     /**
-     * Play reward sound: A cheerful, rising retro synth arpeggio (C5 -> E5 -> G5 -> C6).
+     * Play reward sound: Play localized raw success chimes.
      */
     fun playSuccess() {
         if (isMute) return
-        soundScope.launch {
-            playTone(523.25, 120) // C5
-            playTone(659.25, 120) // E5
-            playTone(783.99, 120) // G5
-            playTone(1046.50, 220) // C6
-        }
+        playRawResource("alert_correct", 523.25, 400)
     }
 
     /**
-     * Play incorrect chime: A soft, low falling "boing" (G3 -> E3).
+     * Play incorrect chime: Play localized raw incorrect speech warning.
      */
     fun playIncorrect() {
         if (isMute) return
-        soundScope.launch {
-            playTone(196.00, 150) // G3
-            playTone(164.81, 250) // E3
-        }
+        playRawResource("alert_incorrect", 164.81, 400)
     }
 
     /**
-     * Play a cute, high-frequency bubble clicking pop sound (B5 quick pop).
+     * Play a cute, high-frequency bubble clicking pop sound.
      */
     fun playClick() {
         if (isMute) return
-        soundScope.launch {
-            playTone(987.77, 60) // B5 quick pop
-        }
+        playRawResource("alert_click", 987.77, 60)
     }
 
     /**

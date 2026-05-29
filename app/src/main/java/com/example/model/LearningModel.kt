@@ -3,7 +3,8 @@ package com.example.model
 enum class SceneType(val displayName: String, val bgResName: String) {
     ZOO("开心动物园", "img_bg_zoo"),
     FOREST("奇妙大森林", "img_bg_forest"),
-    OCEAN("梦幻大海洋", "img_bg_ocean")
+    OCEAN("梦幻大海洋", "img_bg_ocean"),
+    PAW_PATROL("汪汪队基地", "img_bg_paw_patrol")
 }
 
 enum class GameMode(val displayName: String) {
@@ -182,11 +183,65 @@ object SceneData {
         )
     )
 
+    val pawPatrolCharacters = listOf(
+        Animal(
+            id = "ryder",
+            name = "莱德队长",
+            pinyin = "lǎi dé duì zhǎng",
+            english = "Ryder",
+            emoji = "👦",
+            funFact = "莱德队长是汪汪队的帅气队长，他精通各种高科技，最著名的口号是：没有困难的工作，只有勇敢的狗狗！",
+            xPercent = 14f,
+            yPercent = 26f
+        ),
+        Animal(
+            id = "chase",
+            name = "阿奇",
+            pinyin = "ā qí",
+            english = "Chase",
+            emoji = "🐕",
+            funFact = "阿奇是一只特别神气的警犬牧羊犬，不仅跑得快，听力嗅觉也超级厉害，时刻守护着大家的平安！",
+            xPercent = 41f,
+            yPercent = 34f
+        ),
+        Animal(
+            id = "marshall",
+            name = "毛毛",
+            pinyin = "máo máo",
+            english = "Marshall",
+            emoji = "🐩",
+            funFact = "毛毛是一只超级可爱的斑点消防犬，虽然经常笨手笨脚摔跟头，但救援和救火时总是最勇敢的！",
+            xPercent = 78f,
+            yPercent = 28f
+        ),
+        Animal(
+            id = "skye",
+            name = "天天",
+            pinyin = "tiān tiān",
+            english = "Skye",
+            emoji = "🐶",
+            funFact = "天天是一只甜美活泼的飞行犬，她戴着粉色飞行头盔，最喜欢在蔚蓝的蓝天中驾驶直升机自由飞翔！",
+            xPercent = 25f,
+            yPercent = 65f
+        ),
+        Animal(
+            id = "rubble",
+            name = "小砾",
+            pinyin = "xiǎo lì",
+            english = "Rubble",
+            emoji = "🦮",
+            funFact = "小砾是一只力气很大的斗牛犬工程犬，驾驶着帅气的黄色挖掘机，最喜欢吃香甜的零食和滑滑板！",
+            xPercent = 67f,
+            yPercent = 60f
+        )
+    )
+
     fun getAnimalsForScene(type: SceneType): List<Animal> {
         return when (type) {
             SceneType.ZOO -> zooAnimals
             SceneType.FOREST -> forestAnimals
             SceneType.OCEAN -> oceanAnimals
+            SceneType.PAW_PATROL -> pawPatrolCharacters
         }
     }
 }

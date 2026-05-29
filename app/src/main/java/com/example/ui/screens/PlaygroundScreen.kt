@@ -77,6 +77,7 @@ fun PlaygroundScreen(
         SceneType.ZOO -> R.drawable.img_bg_zoo
         SceneType.FOREST -> R.drawable.img_bg_forest
         SceneType.OCEAN -> R.drawable.img_bg_ocean
+        SceneType.PAW_PATROL -> R.drawable.img_bg_paw_patrol
     }
 
     BoxWithConstraints(

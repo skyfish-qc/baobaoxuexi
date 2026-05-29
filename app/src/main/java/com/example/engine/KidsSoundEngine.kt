@@ -43,6 +43,7 @@ class KidsSoundEngine(private val context: Context) {
         add("zoo_enter", "欢迎来到开心动物园！")
         add("forest_enter", "欢迎来到奇妙大森林！")
         add("ocean_enter", "欢迎来到梦幻大海洋！")
+        add("paw_patrol_enter", "欢迎来到汪汪队基地！")
         add("mode_learning_intro", "现在是学习宝典模式。点击画面中可爱的小家伙，学习他们的名字 and 有趣知识吧！")
         add("mode_learning_action", "进入学习宝典模式！指一指画面上的小动物，听听他们有什么秘密吧！")
         add("mode_find_action", "进入找一找小游戏！准备好了吗？")
@@ -63,7 +64,12 @@ class KidsSoundEngine(private val context: Context) {
             listOf("whale", "鲸鱼", "jīng yú", "Whale", "大蓝鲸是海洋里最大的巨无霸，头顶会喷出好高的小喷泉！"),
             listOf("octopus", "章鱼", "zhāng yú", "Octopus", "章鱼小八有八只长长的小脚丫，生气的时候能喷出黑黑的墨汁！"),
             listOf("starfish", "海星", "hǎi xīng", "Starfish", "亮晶晶的海星就像是掉落在神秘海底夜空里的小星星！"),
-            listOf("turtle", "海龟", "hǎi guī", "Turtle", "海龟背着厚厚重重的安全壳，在大海里划水游泳，像飞翔一样！")
+            listOf("turtle", "海龟", "hǎi guī", "Turtle", "海龟背着厚厚重重的安全壳，在大海里划水游泳，像飞翔一样！"),
+            listOf("ryder", "莱德队长", "lǎi dé duì zhǎng", "Ryder", "莱德队长是汪汪队的帅气队长，他精通各种高科技，最著名的口号是：没有困难的工作，只有勇敢的狗狗！"),
+            listOf("chase", "阿奇", "ā qí", "Chase", "阿奇是一只特别神气的警犬牧羊犬，不仅跑得快，听力嗅觉也超级厉害，时刻守护着大家的平安！"),
+            listOf("marshall", "毛毛", "máo máo", "Marshall", "毛毛是一只超级可爱的斑点消防犬，虽然经常笨手笨脚摔跟头，但救援和救火时总是最勇敢的！"),
+            listOf("skye", "天天", "tiān tiān", "Skye", "天天是一只甜美活泼的飞行犬，她戴着粉色飞行头盔，最喜欢在蔚蓝的蓝天中驾驶直升机自由飞翔！"),
+            listOf("rubble", "小砾", "xiǎo lì", "Rubble", "小砾是一只力气很大的斗牛犬工程犬，驾驶着帅气的黄色挖掘机，最喜欢吃香甜的零食 and 滑滑板！")
         )
 
         for (a in animals) {

@@ -7,6 +7,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -138,13 +140,14 @@ fun SceneSelectScreen(
             }
         }
 
-        // Horizontal Row containing the 3 gorgeous scene selection cards
+        // Horizontal Row containing the 4 gorgeous scene selection cards
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 16.dp)
                 .align(Alignment.BottomCenter)
-                .offset(y = (-16).dp), // slightly elevated from the extreme bottom edge
+                .offset(y = (-16).dp)
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -176,6 +179,16 @@ fun SceneSelectScreen(
                 bgImgRes = R.drawable.img_bg_ocean,
                 onClicked = { viewModel.selectScene(SceneType.OCEAN) },
                 modifier = Modifier.testTag("select_ocean_card")
+            )
+
+            SceneCard(
+                sceneType = SceneType.PAW_PATROL,
+                emoji = "🐾",
+                themeColor = Color(0xFFE63946), // Vibrant PAW red
+                subLabel = "莱德 阿奇 毛毛 天天... 🐾",
+                bgImgRes = R.drawable.img_bg_paw_patrol,
+                onClicked = { viewModel.selectScene(SceneType.PAW_PATROL) },
+                modifier = Modifier.testTag("select_paw_patrol_card")
             )
         }
     }

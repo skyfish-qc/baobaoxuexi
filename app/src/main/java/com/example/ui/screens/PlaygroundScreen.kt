@@ -34,6 +34,10 @@ import com.example.model.Animal
 import com.example.model.GameMode
 import com.example.model.SceneData
 import com.example.model.SceneType
+import com.example.model.imageUrl
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.viewmodel.LearningEvent
 import com.example.viewmodel.LearningViewModel
 import com.example.viewmodel.ScreenType
@@ -155,12 +159,35 @@ fun PlaygroundScreen(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        // Large readable Emoji
-                        Text(
-                            text = animal.emoji,
-                            fontSize = 32.sp,
-                            textAlign = TextAlign.Center
-                        )
+                        if (animal.imageUrl.isNotEmpty()) {
+                            val painter = rememberAsyncImagePainter(model = animal.imageUrl)
+                            val state = painter.state
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.size(52.dp)
+                            ) {
+                                Image(
+                                    painter = painter,
+                                    contentDescription = animal.name,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Fit
+                                )
+                                // If loading or has error, overlay or show the emoji as fallback
+                                if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
+                                    Text(
+                                        text = animal.emoji,
+                                        fontSize = 32.sp,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        } else {
+                            Text(
+                                text = animal.emoji,
+                                fontSize = 32.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
 
@@ -443,10 +470,34 @@ fun PlaygroundScreen(
                                 .size(90.dp)
                                 .background(SoftMint.copy(alpha = 0.15f), CircleShape)
                         ) {
-                            Text(
-                                text = targetAnimal?.emoji ?: "⭐",
-                                fontSize = 56.sp
-                            )
+                            val target = targetAnimal
+                            if (target != null && target.imageUrl.isNotEmpty()) {
+                                val painter = rememberAsyncImagePainter(model = target.imageUrl)
+                                val state = painter.state
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.size(72.dp)
+                                ) {
+                                    Image(
+                                        painter = painter,
+                                        contentDescription = target.name,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
+                                        Text(
+                                            text = target.emoji,
+                                            fontSize = 52.sp,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                            } else {
+                                Text(
+                                    text = targetAnimal?.emoji ?: "⭐",
+                                    fontSize = 56.sp
+                                )
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(10.dp))
@@ -499,10 +550,34 @@ fun PlaygroundScreen(
                                 .background(SoftCyanLight, RoundedCornerShape(20.dp))
                                 .padding(12.dp)
                         ) {
-                            Text(
-                                text = animal.emoji,
-                                fontSize = 64.sp
-                            )
+                            if (animal.imageUrl.isNotEmpty()) {
+                                val painter = rememberAsyncImagePainter(model = animal.imageUrl)
+                                val state = painter.state
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.size(80.dp)
+                                ) {
+                                    Image(
+                                        painter = painter,
+                                        contentDescription = animal.name,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
+                                        Text(
+                                            text = animal.emoji,
+                                            fontSize = 64.sp,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                            } else {
+                                Text(
+                                    text = animal.emoji,
+                                    fontSize = 64.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = animal.name,

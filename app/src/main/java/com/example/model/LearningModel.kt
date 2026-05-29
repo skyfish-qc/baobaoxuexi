@@ -245,3 +245,32 @@ object SceneData {
         }
     }
 }
+
+val Animal.imageUrl: String
+    get() = when (id) {
+        "panda" -> "https://img.icons8.com/color/144/panda.png"
+        "elephant" -> "https://img.icons8.com/color/144/elephant.png"
+        "lion" -> "https://img.icons8.com/color/144/lion.png"
+        "monkey" -> "https://img.icons8.com/color/144/monkey.png"
+        "giraffe" -> "https://img.icons8.com/color/144/giraffe.png"
+        
+        "bear" -> "https://img.icons8.com/color/144/bear.png"
+        "rabbit" -> "https://img.icons8.com/color/144/rabbit.png"
+        "squirrel" -> "https://img.icons8.com/color/144/squirrel.png"
+        "owl" -> "https://img.icons8.com/color/144/owl.png"
+        "deer" -> "https://img.icons8.com/color/144/deer.png"
+        
+        "dolphin" -> "https://img.icons8.com/color/144/dolphin.png"
+        "whale" -> "https://img.icons8.com/color/144/whale.png"
+        "octopus" -> "https://img.icons8.com/color/144/octopus.png"
+        "starfish" -> "https://img.icons8.com/color/144/starfish.png"
+        "turtle" -> "https://img.icons8.com/color/144/sea-turtle.png"
+        
+        "ryder" -> "https://img.icons8.com/color/144/school-boy.png"
+        "chase" -> "https://img.icons8.com/color/144/police-dog.png"
+        "marshall" -> "https://img.icons8.com/color/144/dalmatian.png"
+        "skye" -> "https://img.icons8.com/color/144/spaniel.png"
+        "rubble" -> "https://img.icons8.com/color/144/bulldog.png"
+        else -> ""
+    }
+

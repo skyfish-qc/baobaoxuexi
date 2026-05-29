@@ -79,55 +79,6 @@ fun PlaygroundScreen(
         SceneType.OCEAN -> R.drawable.img_bg_ocean
     }
 
-    // Interactive Particle Array for Fireworks / Confetti
-    val particles = remember { mutableStateListOf<Particle>() }
-
-    // Confetti Physics animation loop
-    LaunchedEffect(isCelebrationActive) {
-        if (isCelebrationActive) {
-            particles.clear()
-            // Spawn 55 happy colorful particles bursting from the center
-            val randomColors = listOf(
-                Color(0xFFFF595E), Color(0xFFFFCA3A), Color(0xFF8AC926),
-                Color(0xFF1982C4), Color(0xFF6A4C93), Color(0xFFFF7096)
-            )
-            val screenWidthPx = 1400f // approximate center
-            val screenHeightPx = 800f
-
-            for (i in 0 until 55) {
-                val angle = Random.nextFloat() * 2 * Math.PI
-                val speed = Random.nextFloat() * 12f + 4f
-                particles.add(
-                    Particle(
-                        x = screenWidthPx / 2f + (Random.nextFloat() * 80f - 40f),
-                        y = screenHeightPx / 2f - 100f,
-                        color = randomColors.random(),
-                        size = Random.nextFloat() * 12f + 8f,
-                        vx = (kotlin.math.cos(angle) * speed).toFloat(),
-                        vy = (kotlin.math.sin(angle) * speed).toFloat() - 3f, // give slight upwards boost
-                        shape = Random.nextInt(3)
-                    )
-                )
-            }
-
-            // Update particle physics frame loop (around ~3 seconds)
-            var frame = 0
-            while (frame < 120) {
-                delay(16)
-                particles.forEach { p ->
-                    p.x += p.vx
-                    p.y += p.vy
-                    p.vy += 0.35f // Gravity pulling downwards
-                    p.vx *= 0.98f // Air drag index
-                }
-                frame++
-            }
-            particles.clear()
-        } else {
-            particles.clear()
-        }
-    }
-
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
@@ -145,20 +96,7 @@ fun PlaygroundScreen(
 
         // 2. Interactive Animal Floating Nodes
         animals.forEach { animal ->
-            // Independent slow floating bob offset per animal
-            val infiniteTransition = rememberInfiniteTransition(label = animal.id)
-            val bobOffset by infiniteTransition.animateFloat(
-                initialValue = -5f,
-                targetValue = 5f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(
-                        durationMillis = 1500 + (animal.id.hashCode() % 6) * 150,
-                        easing = FastOutSlowInEasing
-                    ),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = animal.id
-            )
+            val bobOffset = 0f
 
             // Pulse border animation if this animal is the correct target in Find-it Mode
             val isTarget = (gameMode == GameMode.FIND_IT && targetAnimal?.id == animal.id)
@@ -175,22 +113,12 @@ fun PlaygroundScreen(
                     .offset(x = leftMargin, y = topMargin + bobOffset.dp)
                     .size(86.dp)
             ) {
-                // Outer Pulse Ring for correct targets to gently help the kid
+                // Outer static highlight ring for correct targets to gently help the kid
                 if (isTarget) {
-                    val pulseScale by infiniteTransition.animateFloat(
-                        initialValue = 0.95f,
-                        targetValue = 1.35f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(1250, easing = LinearOutSlowInEasing),
-                            repeatMode = RepeatMode.Restart
-                        ),
-                        label = "pulse"
-                    )
                     Box(
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .size(76.dp)
-                            .scale(pulseScale)
+                            .size(78.dp)
                             .background(SunshineYellow.copy(alpha = 0.45f), CircleShape)
                     )
                 }
@@ -274,42 +202,6 @@ fun PlaygroundScreen(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
-                    }
-                }
-            }
-        }
-
-        // 3. Celebratory Confetti Canvas drawing layer
-        if (isCelebrationActive && particles.isNotEmpty()) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                particles.forEach { p ->
-                    when (p.shape) {
-                        0 -> { // draw simple star/asterisk particle
-                            drawCircle(color = p.color, radius = p.size, center = Offset(p.x, p.y))
-                            // add sparkles
-                            drawLine(
-                                color = Color.White,
-                                start = Offset(p.x - p.size, p.y),
-                                end = Offset(p.x + p.size, p.y),
-                                strokeWidth = 3f
-                            )
-                            drawLine(
-                                color = Color.White,
-                                start = Offset(p.x, p.y - p.size),
-                                end = Offset(p.x, p.y + p.size),
-                                strokeWidth = 3f
-                            )
-                        }
-                        1 -> { // draw standard circles
-                            drawCircle(color = p.color, radius = p.size, center = Offset(p.x, p.y))
-                        }
-                        else -> { // draw cute squares
-                            drawRect(
-                                color = p.color,
-                                topLeft = Offset(p.x - p.size / 2, p.y - p.size / 2),
-                                size = androidx.compose.ui.geometry.Size(p.size, p.size)
-                            )
-                        }
                     }
                 }
             }
@@ -696,7 +588,7 @@ fun PlaygroundScreen(
                             // Action button to pronounce again
                             Button(
                                 onClick = {
-                                    val ttsText = "${animal.name}，拼音拼写是 ${animal.pinyin}。英文是 ${animal.english}。${animal.funFact}"
+                                    val ttsText = "${animal.name}！拼写是：${animal.pinyin}。英文叫 ${animal.english}。${animal.funFact}"
                                     viewModel.triggerEvent(LearningEvent.Speak(ttsText))
                                 },
                                 shape = RoundedCornerShape(16.dp),

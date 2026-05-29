@@ -4,58 +4,164 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
-import android.speech.tts.TextToSpeech
+import android.media.MediaPlayer
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Locale
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
+import java.net.URLEncoder
+import java.security.MessageDigest
 import kotlin.math.sin
 
 class KidsSoundEngine(private val context: Context) {
-    private var tts: TextToSpeech? = null
-    private var isTtsReady = false
+    private val soundScope = CoroutineScope(Dispatchers.IO)
+    private var currentMediaPlayer: MediaPlayer? = null
     var isMute = false
 
-    init {
-        initTts()
-    }
-
-    private fun initTts() {
-        try {
-            tts = TextToSpeech(context) { status ->
-                if (status == TextToSpeech.SUCCESS) {
-                    val result = tts?.setLanguage(Locale.CHINA)
-                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Log.e("KidsSoundEngine", "Chinese language pack is missing or not supported on this device. Trying default Locale.")
-                        val defaultResult = tts?.setLanguage(Locale.CHINESE)
-                        isTtsReady = (defaultResult != TextToSpeech.LANG_MISSING_DATA && defaultResult != TextToSpeech.LANG_NOT_SUPPORTED)
-                    } else {
-                        isTtsReady = true
-                    }
-                } else {
-                    Log.e("KidsSoundEngine", "TTS initialization failed.")
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("KidsSoundEngine", "Error initializing TTS: ${e.message}")
+    private val cacheDir = File(context.cacheDir, "audio_cache").apply {
+        if (!exists()) {
+            mkdirs()
         }
     }
 
     /**
-     * Synthesize spoken words with automatic fallback logging.
+     * MD5 Hashing helper to generate uniquely recognizable, clean file keys for text sentences.
+     */
+    private fun String.md5(): String {
+        return try {
+            val digest = MessageDigest.getInstance("MD5")
+            val bytes = digest.digest(this.toByteArray(Charsets.UTF_8))
+            bytes.joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            this.hashCode().toString()
+        }
+    }
+
+    /**
+     * Securely fetches and caches high-fidelity MP3 voice outputs from Youdao's speech synthesis engine.
+     */
+    private fun downloadAudioFile(text: String, file: File): Boolean {
+        var connection: java.net.URLConnection? = null
+        try {
+            val encodedText = URLEncoder.encode(text, "UTF-8")
+            val urlString = "https://dict.youdao.com/dictvoice?audio=$encodedText&le=zh"
+            val url = URL(urlString)
+            connection = url.openConnection()
+            connection.connectTimeout = 4000
+            connection.readTimeout = 4000
+
+            connection.getInputStream().use { inputStream ->
+                FileOutputStream(file).use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            return file.exists() && file.length() > 0
+        } catch (e: Exception) {
+            Log.e("KidsSoundEngine", "Failed to download pronunciation audio for: \"$text\". Error: ${e.message}")
+            if (file.exists()) {
+                file.delete()
+            }
+            return false
+        }
+    }
+
+    /**
+     * Speaks the sentence by loading from persistent cache or fetching it over the network.
+     * Stops any currently playing audio if stopPrevious is enabled.
      */
     fun speak(text: String, stopPrevious: Boolean = true) {
         if (isMute) return
-        if (isTtsReady) {
-            try {
-                val queueMode = if (stopPrevious) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
-                tts?.speak(text, queueMode, null, "ToddlerSpeakId")
-            } catch (e: Exception) {
-                Log.e("KidsSoundEngine", "TTS speak failed: ${e.message}")
+
+        soundScope.launch {
+            if (stopPrevious) {
+                stopPlaybackInternal()
             }
-        } else {
-            Log.w("KidsSoundEngine", "TTS is not ready yet or unsupported. Text requested: $text")
+
+            val key = text.md5()
+            val cachedFile = File(cacheDir, "$key.mp3")
+
+            // Determine if asset is ready locally
+            val isReady = if (cachedFile.exists() && cachedFile.length() > 0) {
+                true
+            } else {
+                downloadAudioFile(text, cachedFile)
+            }
+
+            if (isReady && cachedFile.exists()) {
+                playMp3FileInternal(cachedFile)
+            } else {
+                Log.w("KidsSoundEngine", "Audios cache miss and offline. Falling back to synth chime.")
+                // Play short synth melody as resilient secondary indicator
+                playTone(550.0, 120)
+            }
+        }
+    }
+
+    /**
+     * Play a list of text sentences in background on demand to build a smooth local sound buffer.
+     */
+    fun preCache(texts: List<String>) {
+        soundScope.launch {
+            for (text in texts) {
+                val key = text.md5()
+                val cachedFile = File(cacheDir, "$key.mp3")
+                if (!cachedFile.exists() || cachedFile.length() == 0L) {
+                    val success = downloadAudioFile(text, cachedFile)
+                    if (success) {
+                        Log.d("KidsSoundEngine", "Pre-cached: \"$text\"")
+                    }
+                    kotlinx.coroutines.delay(120)
+                }
+            }
+        }
+    }
+
+    private fun stopPlaybackInternal() {
+        synchronized(this) {
+            try {
+                currentMediaPlayer?.let { player ->
+                    if (player.isPlaying) {
+                        player.stop()
+                    }
+                    player.release()
+                }
+                currentMediaPlayer = null
+            } catch (e: Exception) {
+                Log.e("KidsSoundEngine", "Error stopping playback: ${e.message}")
+            }
+        }
+    }
+
+    private fun playMp3FileInternal(file: File) {
+        synchronized(this) {
+            try {
+                val player = MediaPlayer().apply {
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build()
+                    )
+                    setDataSource(file.absolutePath)
+                    prepare()
+                    start()
+                }
+                currentMediaPlayer = player
+                player.setOnCompletionListener {
+                    synchronized(this) {
+                        if (currentMediaPlayer == player) {
+                            currentMediaPlayer = null
+                        }
+                    }
+                    player.release()
+                }
+            } catch (e: Exception) {
+                Log.e("KidsSoundEngine", "Error playing MP3 file: ${e.message}")
+                playTone(600.0, 100)
+            }
         }
     }
 
@@ -64,7 +170,7 @@ class KidsSoundEngine(private val context: Context) {
      */
     fun playSuccess() {
         if (isMute) return
-        CoroutineScope(Dispatchers.Default).launch {
+        soundScope.launch {
             playTone(523.25, 120) // C5
             playTone(659.25, 120) // E5
             playTone(783.99, 120) // G5
@@ -77,18 +183,18 @@ class KidsSoundEngine(private val context: Context) {
      */
     fun playIncorrect() {
         if (isMute) return
-        CoroutineScope(Dispatchers.Default).launch {
+        soundScope.launch {
             playTone(196.00, 150) // G3
             playTone(164.81, 250) // E3
         }
     }
 
     /**
-     * Play a cute, high-frequency bubble clicking pop sound (C6 for a short slice).
+     * Play a cute, high-frequency bubble clicking pop sound (B5 quick pop).
      */
     fun playClick() {
         if (isMute) return
-        CoroutineScope(Dispatchers.Default).launch {
+        soundScope.launch {
             playTone(987.77, 60) // B5 quick pop
         }
     }
@@ -149,11 +255,6 @@ class KidsSoundEngine(private val context: Context) {
     }
 
     fun shutdown() {
-        try {
-            tts?.stop()
-            tts?.shutdown()
-        } catch (e: Exception) {
-            Log.e("KidsSoundEngine", "Error shutting down TTS: ${e.message}")
-        }
+        stopPlaybackInternal()
     }
 }

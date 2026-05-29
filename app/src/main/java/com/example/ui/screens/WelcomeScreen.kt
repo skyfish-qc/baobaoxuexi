@@ -44,54 +44,12 @@ fun WelcomeScreen(
 ) {
     val isMute by viewModel.isMute.collectAsState()
 
-    // Slide/float translation for clouds
-    val infiniteTransition = rememberInfiniteTransition(label = "clouds")
-    val cloudOffset1 by infiniteTransition.animateFloat(
-        initialValue = -100f,
-        targetValue = 1400f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(28000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "cloud1"
-    )
-    val cloudOffset2 by infiniteTransition.animateFloat(
-        initialValue = 1400f,
-        targetValue = -300f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(34000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "cloud2"
-    )
-
-    // Bobbing scaling motion for the main logo
-    val logoScale by infiniteTransition.animateFloat(
-        initialValue = 0.95f,
-        targetValue = 1.05f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "logo"
-    )
-    val logoRotation by infiniteTransition.animateFloat(
-        initialValue = -3f,
-        targetValue = 3f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(3000, easing = SineCrossingEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "logo_rot"
-    )
-
-    // Spring scaling when touching buttons
-    var isPressed by remember { mutableStateOf(false) }
-    val buttonScale by animateFloatAsState(
-        targetValue = if (isPressed) 0.92f else 1.0f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
-        label = "button_scale"
-    )
+    // Static positions and scale for E-ink display (no animations to avoid ghosting)
+    val cloudOffset1 = 120f
+    val cloudOffset2 = 800f
+    val logoScale = 1.0f
+    val logoRotation = 0f
+    val buttonScale = 1.0f
 
     Box(
         modifier = modifier

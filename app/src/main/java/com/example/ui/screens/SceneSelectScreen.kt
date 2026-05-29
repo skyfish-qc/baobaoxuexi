@@ -191,12 +191,7 @@ fun SceneCard(
     onClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isHovered by remember { mutableStateOf(false) }
-    val cardScale by animateFloatAsState(
-        targetValue = if (isHovered) 1.05f else 1.0f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-        label = "card_scale"
-    )
+    val cardScale = 1.0f
 
     Box(
         modifier = modifier
@@ -210,7 +205,6 @@ fun SceneCard(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = {
-                    isHovered = true
                     onClicked()
                 }
             )

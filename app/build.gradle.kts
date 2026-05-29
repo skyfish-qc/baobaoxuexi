@@ -246,29 +246,29 @@ tasks.register("downloadOfflineImages") {
         }
 
         val animalImageUrls = mapOf(
-            "panda" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f43c.png",
-            "elephant" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f418.png",
-            "lion" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f981.png",
-            "monkey" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f435.png",
-            "giraffe" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f992.png",
+            "panda" to "https://img.icons8.com/color/256/panda.png",
+            "elephant" to "https://img.icons8.com/color/256/elephant.png",
+            "lion" to "https://img.icons8.com/color/256/lion.png",
+            "monkey" to "https://img.icons8.com/color/256/monkey.png",
+            "giraffe" to "https://img.icons8.com/color/256/giraffe.png",
             
-            "bear" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f43b.png",
-            "rabbit" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f430.png",
-            "squirrel" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f43f.png",
-            "owl" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f989.png",
-            "deer" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f98c.png",
+            "bear" to "https://img.icons8.com/color/256/bear.png",
+            "rabbit" to "https://img.icons8.com/color/256/rabbit.png",
+            "squirrel" to "https://img.icons8.com/color/256/squirrel.png",
+            "owl" to "https://img.icons8.com/color/256/owl.png",
+            "deer" to "https://img.icons8.com/color/256/deer.png",
             
-            "dolphin" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f42c.png",
-            "whale" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f433.png",
-            "octopus" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f419.png",
-            "starfish" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u2b50.png",
-            "turtle" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f422.png",
+            "dolphin" to "https://img.icons8.com/color/256/dolphin.png",
+            "whale" to "https://img.icons8.com/color/256/whale.png",
+            "octopus" to "https://img.icons8.com/color/256/octopus.png",
+            "starfish" to "https://img.icons8.com/color/256/starfish.png",
+            "turtle" to "https://img.icons8.com/color/256/sea-turtle.png",
             
-            "ryder" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f466.png",
-            "chase" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f415.png",
-            "marshall" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f429.png",
-            "skye" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f436.png",
-            "rubble" to "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/png/128/emoji_u1f9ae.png"
+            "ryder" to "https://img.icons8.com/color/256/school-boy.png",
+            "chase" to "https://img.icons8.com/color/256/police-dog.png",
+            "marshall" to "https://img.icons8.com/color/256/dalmatian.png",
+            "skye" to "https://img.icons8.com/color/256/spaniel.png",
+            "rubble" to "https://img.icons8.com/color/256/bulldog.png"
         )
 
         println("Offline animal image pre-cache running: preparing ${animalImageUrls.size} files in src/main/res/drawable/")

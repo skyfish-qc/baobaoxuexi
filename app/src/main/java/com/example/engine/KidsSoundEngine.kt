@@ -21,6 +21,20 @@ class KidsSoundEngine(private val context: Context) {
     private var currentMediaPlayer: MediaPlayer? = null
     var isMute = false
 
+    private val activePlayers = java.util.Collections.synchronizedSet(java.util.HashSet<MediaPlayer>())
+
+    private fun safeRelease(player: MediaPlayer?) {
+        if (player == null) return
+        val removed = activePlayers.remove(player)
+        if (removed) {
+            try {
+                player.release()
+            } catch (e: Throwable) {
+                Log.e("KidsSoundEngine", "Error releasing player: ${e.message}")
+            }
+        }
+    }
+
     private val cacheDir = File(context.cacheDir, "audio_cache").apply {
         if (!exists()) {
             mkdirs()
@@ -94,34 +108,56 @@ class KidsSoundEngine(private val context: Context) {
         soundScope.launch {
             synchronized(this@KidsSoundEngine) {
                 stopPlaybackInternal()
+                var player1: MediaPlayer? = null
                 try {
-                    val player1 = MediaPlayer.create(context, resId1)
-                    currentMediaPlayer = player1
-                    player1.setOnCompletionListener {
-                        player1.release()
-                        soundScope.launch {
+                    player1 = MediaPlayer.create(context, resId1)
+                    if (player1 != null) {
+                        activePlayers.add(player1)
+                        currentMediaPlayer = player1
+                        player1.setOnCompletionListener {
                             synchronized(this@KidsSoundEngine) {
-                                try {
-                                    val player2 = MediaPlayer.create(context, resId2)
-                                    currentMediaPlayer = player2
-                                    player2.setOnCompletionListener {
-                                        player2.release()
-                                        synchronized(this@KidsSoundEngine) {
-                                            if (currentMediaPlayer == player2) {
-                                                currentMediaPlayer = null
+                                if (currentMediaPlayer == player1) {
+                                    currentMediaPlayer = null
+                                }
+                            }
+                            safeRelease(player1)
+
+                            soundScope.launch {
+                                synchronized(this@KidsSoundEngine) {
+                                    if (currentMediaPlayer == null) {
+                                        var player2: MediaPlayer? = null
+                                        try {
+                                            player2 = MediaPlayer.create(context, resId2)
+                                            if (player2 != null) {
+                                                activePlayers.add(player2)
+                                                currentMediaPlayer = player2
+                                                player2.setOnCompletionListener {
+                                                    synchronized(this@KidsSoundEngine) {
+                                                        if (currentMediaPlayer == player2) {
+                                                            currentMediaPlayer = null
+                                                        }
+                                                    }
+                                                    safeRelease(player2)
+                                                }
+                                                player2.start()
+                                            } else {
+                                                Log.e("KidsSoundEngine", "player2 is null for resId2")
                                             }
+                                        } catch (e: Exception) {
+                                            Log.e("KidsSoundEngine", "Error playing second sequence: ${e.message}")
+                                            safeRelease(player2)
                                         }
                                     }
-                                    player2.start()
-                                } catch (e: Exception) {
-                                    Log.e("KidsSoundEngine", "Error playing second sequence: ${e.message}")
                                 }
                             }
                         }
+                        player1.start()
+                    } else {
+                        Log.e("KidsSoundEngine", "player1 is null for resId1")
                     }
-                    player1.start()
                 } catch (e: Exception) {
                     Log.e("KidsSoundEngine", "Error playing first sequence: ${e.message}")
+                    safeRelease(player1)
                 }
             }
         }
@@ -133,20 +169,28 @@ class KidsSoundEngine(private val context: Context) {
             soundScope.launch {
                 synchronized(this@KidsSoundEngine) {
                     stopPlaybackInternal()
+                    var player: MediaPlayer? = null
                     try {
-                        val player = MediaPlayer.create(context, resId)
-                        currentMediaPlayer = player
-                        player.setOnCompletionListener {
-                            player.release()
-                            synchronized(this@KidsSoundEngine) {
-                                if (currentMediaPlayer == player) {
-                                    currentMediaPlayer = null
+                        player = MediaPlayer.create(context, resId)
+                        if (player != null) {
+                            activePlayers.add(player)
+                            currentMediaPlayer = player
+                            player.setOnCompletionListener {
+                                synchronized(this@KidsSoundEngine) {
+                                    if (currentMediaPlayer == player) {
+                                        currentMediaPlayer = null
+                                    }
                                 }
+                                safeRelease(player)
                             }
+                            player.start()
+                        } else {
+                            Log.e("KidsSoundEngine", "player is null in playRawResource for $resName")
+                            playTone(fbToneFreq, fbToneDuration)
                         }
-                        player.start()
                     } catch (e: Exception) {
                         Log.e("KidsSoundEngine", "Error playing raw effect $resName: ${e.message}")
+                        safeRelease(player)
                         playTone(fbToneFreq, fbToneDuration)
                     }
                 }
@@ -211,7 +255,8 @@ class KidsSoundEngine(private val context: Context) {
             val animalList = listOf(
                 "panda" to "熊猫", "elephant" to "大象", "lion" to "狮子", "monkey" to "猴子", "giraffe" to "长颈鹿",
                 "bear" to "大熊", "rabbit" to "兔子", "squirrel" to "松鼠", "owl" to "猫头鹰", "deer" to "小鹿",
-                "dolphin" to "海豚", "whale" to "鲸鱼", "octopus" to "章鱼", "starfish" to "海星", "turtle" to "海龟"
+                "dolphin" to "海豚", "whale" to "鲸鱼", "octopus" to "章鱼", "starfish" to "海星", "turtle" to "海龟",
+                "ryder" to "莱德", "chase" to "阿奇", "marshall" to "毛毛", "skye" to "天天", "rubble" to "小砾"
             )
             val parts = text.split("再仔细找一找")
             if (parts.size >= 2) {
@@ -245,20 +290,27 @@ class KidsSoundEngine(private val context: Context) {
                         if (stopPrevious) {
                             stopPlaybackInternal()
                         }
+                        var player: MediaPlayer? = null
                         try {
-                            val player = MediaPlayer.create(context, resId)
-                            currentMediaPlayer = player
-                            player.setOnCompletionListener {
-                                player.release()
-                                synchronized(this@KidsSoundEngine) {
-                                    if (currentMediaPlayer == player) {
-                                        currentMediaPlayer = null
+                            player = MediaPlayer.create(context, resId)
+                            if (player != null) {
+                                activePlayers.add(player)
+                                currentMediaPlayer = player
+                                player.setOnCompletionListener {
+                                    synchronized(this@KidsSoundEngine) {
+                                        if (currentMediaPlayer == player) {
+                                            currentMediaPlayer = null
+                                        }
                                     }
+                                    safeRelease(player)
                                 }
+                                player.start()
+                            } else {
+                                Log.e("KidsSoundEngine", "player is null in speak offline for $offlineResName")
                             }
-                            player.start()
                         } catch (e: Exception) {
                             Log.e("KidsSoundEngine", "Error playing offline resource: ${e.message}")
+                            safeRelease(player)
                         }
                     }
                 }
@@ -313,24 +365,27 @@ class KidsSoundEngine(private val context: Context) {
 
     private fun stopPlaybackInternal() {
         synchronized(this) {
-            try {
-                currentMediaPlayer?.let { player ->
+            val player = currentMediaPlayer
+            currentMediaPlayer = null
+            if (player != null) {
+                try {
                     if (player.isPlaying) {
                         player.stop()
                     }
-                    player.release()
+                } catch (e: Exception) {
+                    Log.e("KidsSoundEngine", "Error stopping player: ${e.message}")
                 }
-                currentMediaPlayer = null
-            } catch (e: Exception) {
-                Log.e("KidsSoundEngine", "Error stopping playback: ${e.message}")
+                safeRelease(player)
             }
         }
     }
 
     private fun playMp3FileInternal(file: File) {
         synchronized(this) {
+            stopPlaybackInternal()
+            var player: MediaPlayer? = null
             try {
-                val player = MediaPlayer().apply {
+                player = MediaPlayer().apply {
                     setAudioAttributes(
                         AudioAttributes.Builder()
                             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -341,6 +396,7 @@ class KidsSoundEngine(private val context: Context) {
                     prepare()
                     start()
                 }
+                activePlayers.add(player)
                 currentMediaPlayer = player
                 player.setOnCompletionListener {
                     synchronized(this) {
@@ -348,10 +404,11 @@ class KidsSoundEngine(private val context: Context) {
                             currentMediaPlayer = null
                         }
                     }
-                    player.release()
+                    safeRelease(player)
                 }
             } catch (e: Exception) {
                 Log.e("KidsSoundEngine", "Error playing MP3 file: ${e.message}")
+                safeRelease(player)
                 playTone(600.0, 100)
             }
         }

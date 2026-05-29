@@ -246,37 +246,34 @@ tasks.register("downloadOfflineImages") {
         }
 
         val animalImageUrls = mapOf(
-            "panda" to "https://img.icons8.com/color/256/panda.png",
-            "elephant" to "https://img.icons8.com/color/256/elephant.png",
-            "lion" to "https://img.icons8.com/color/256/lion.png",
-            "monkey" to "https://img.icons8.com/color/256/monkey.png",
-            "giraffe" to "https://img.icons8.com/color/256/giraffe.png",
+            "panda" to "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=350&h=350&q=80",
+            "elephant" to "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=350&h=350&q=80",
+            "lion" to "https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=350&h=350&q=80",
+            "monkey" to "https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=350&h=350&q=80",
+            "giraffe" to "https://images.unsplash.com/photo-1547721064-da6cfb341d50?auto=format&fit=crop&w=350&h=350&q=80",
             
-            "bear" to "https://img.icons8.com/color/256/bear.png",
-            "rabbit" to "https://img.icons8.com/color/256/rabbit.png",
-            "squirrel" to "https://img.icons8.com/color/256/squirrel.png",
-            "owl" to "https://img.icons8.com/color/256/owl.png",
-            "deer" to "https://img.icons8.com/color/256/deer.png",
+            "bear" to "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=350&h=350&q=80",
+            "rabbit" to "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=350&h=350&q=80",
+            "squirrel" to "https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?auto=format&fit=crop&w=350&h=350&q=80",
+            "owl" to "https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=350&h=350&q=80",
+            "deer" to "https://images.unsplash.com/photo-1484406566174-9da000fda645?auto=format&fit=crop&w=350&h=350&q=80",
             
-            "dolphin" to "https://img.icons8.com/color/256/dolphin.png",
-            "whale" to "https://img.icons8.com/color/256/whale.png",
-            "octopus" to "https://img.icons8.com/color/256/octopus.png",
-            "starfish" to "https://img.icons8.com/color/256/starfish.png",
-            "turtle" to "https://img.icons8.com/color/256/sea-turtle.png",
+            "dolphin" to "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?auto=format&fit=crop&w=350&h=350&q=80",
+            "whale" to "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=350&h=350&q=80",
+            "octopus" to "https://images.unsplash.com/photo-1545671913-b89ac1b4ac10?auto=format&fit=crop&w=350&h=350&q=80",
+            "starfish" to "https://images.unsplash.com/photo-1546026423-cc4642628d2b?auto=format&fit=crop&w=350&h=350&q=80",
+            "turtle" to "https://images.unsplash.com/photo-1559583985-c80d8ad9b29f?auto=format&fit=crop&w=350&h=350&q=80",
             
-            "ryder" to "https://img.icons8.com/color/256/school-boy.png",
-            "chase" to "https://img.icons8.com/color/256/police-dog.png",
-            "marshall" to "https://img.icons8.com/color/256/dalmatian.png",
-            "skye" to "https://img.icons8.com/color/256/spaniel.png",
-            "rubble" to "https://img.icons8.com/color/256/bulldog.png"
+            "ryder" to "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=350&h=350&q=80",
+            "chase" to "https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&w=350&h=350&q=80",
+            "marshall" to "https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=350&h=350&q=80",
+            "skye" to "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=350&h=350&q=80",
+            "rubble" to "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=350&h=350&q=80"
         )
 
         println("Offline animal image pre-cache running: preparing ${animalImageUrls.size} files in src/main/res/drawable/")
         for ((id, urlStr) in animalImageUrls) {
             val outFile = File(drawableDir, "img_animal_$id.png")
-            if (outFile.exists() && outFile.length() > 0) {
-                continue
-            }
             var input: InputStream? = null
             var output: OutputStream? = null
             try {

@@ -149,14 +149,14 @@ fun PlaygroundScreen(
             Box(
                 modifier = Modifier
                     .offset(x = leftMargin, y = topMargin + bobOffset.dp)
-                    .size(86.dp)
+                    .size(172.dp)
             ) {
                 // Outer static highlight ring for correct targets to gently help the kid
                 if (isTarget) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .size(78.dp)
+                            .size(156.dp)
                             .background(SunshineYellow.copy(alpha = 0.45f), CircleShape)
                     )
                 }
@@ -166,14 +166,14 @@ fun PlaygroundScreen(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .size(70.dp)
-                        .shadow(if (isWrongPressed) 2.dp else 6.dp, CircleShape)
+                        .size(140.dp)
+                        .shadow(if (isWrongPressed) 4.dp else 12.dp, CircleShape)
                         .background(
                             color = if (isWrongPressed) Color.LightGray.copy(alpha = 0.5f) else Color.White,
                             shape = CircleShape
                         )
                         .border(
-                            width = if (isTarget) 4.dp else 2.5.dp,
+                            width = if (isTarget) 8.dp else 5.dp,
                             color = if (isTarget) SunshineYellow else if (isWrongPressed) Color.Gray else SoftMint,
                             shape = CircleShape
                         )
@@ -194,8 +194,8 @@ fun PlaygroundScreen(
                     ) {
                         AnimalImage(
                             animal = animal,
-                            size = 52.dp,
-                            emojiSize = 32.sp
+                            size = 104.dp,
+                            emojiSize = 64.sp
                         )
                     }
                 }
@@ -204,19 +204,19 @@ fun PlaygroundScreen(
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .offset(y = 12.dp)
-                        .shadow(3.dp, RoundedCornerShape(8.dp))
+                        .offset(y = 20.dp)
+                        .shadow(6.dp, RoundedCornerShape(12.dp))
                         .background(
                             brush = Brush.horizontalGradient(
                                 colors = listOf(DeepCharcoal, Color(0xFF5E4945))
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(12.dp)
                         )
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = animal.name,
-                        fontSize = 11.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
@@ -228,15 +228,15 @@ fun PlaygroundScreen(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .offset(x = 6.dp, y = (-6).dp)
-                            .size(24.dp)
+                            .offset(x = 10.dp, y = (-10).dp)
+                            .size(40.dp)
                             .background(Color(0xFFFF595E), CircleShape)
-                            .border(1.5.dp, Color.White, CircleShape)
+                            .border(3.dp, Color.White, CircleShape)
                     ) {
                         Text(
                             text = "✕",
                             color = Color.White,
-                            fontSize = 12.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -350,23 +350,25 @@ fun PlaygroundScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Star display
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .shadow(3.dp, RoundedCornerShape(16.dp))
-                        .background(Color.White, RoundedCornerShape(16.dp))
-                        .border(2.dp, SunshineYellow, RoundedCornerShape(16.dp))
-                        .padding(horizontal = 11.dp, vertical = 6.dp)
-                ) {
-                    Text("⭐", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "$starCount",
-                        color = DeepCharcoal,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                // Star display (hidden in FIND_IT mode because no points/score are used)
+                if (gameMode != GameMode.FIND_IT) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .shadow(3.dp, RoundedCornerShape(16.dp))
+                            .background(Color.White, RoundedCornerShape(16.dp))
+                            .border(2.dp, SunshineYellow, RoundedCornerShape(16.dp))
+                            .padding(horizontal = 11.dp, vertical = 6.dp)
+                    ) {
+                        Text("⭐", fontSize = 16.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "$starCount",
+                            color = DeepCharcoal,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
                 // Mute
@@ -506,10 +508,10 @@ fun PlaygroundScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "奖励 🌟 +1",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = SunshineYellow
+                            text = "真棒！继续加油哦！",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = SoftMint
                         )
                     }
                 }

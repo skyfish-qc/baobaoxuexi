@@ -152,12 +152,10 @@ class LearningViewModel(
             if (animal.id == target.id) {
                 // Correct!
                 _isCelebrationActive.value = true
-                val newCount = _starCount.value + 1
-                _starCount.value = newCount
-                saveStarCount(newCount)
+                // No points counting as requested by the user: "找一找模式不需要有积分"
 
                 triggerEvent(LearningEvent.PlaySuccessSound)
-                triggerEvent(LearningEvent.Speak("哇！你太棒啦！成功找到了 ${target.name}！奖励一颗亮闪闪的小星星！"))
+                triggerEvent(LearningEvent.Speak("哇！你太棒啦！成功找到了 ${target.name}！"))
 
                 // Automatically advance to a new find task after a nice celebration delay
                 viewModelScope.launch {

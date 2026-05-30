@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import android.graphics.Bitmap
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -23,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +35,8 @@ import com.example.R
 import com.example.model.SceneType
 import com.example.viewmodel.LearningViewModel
 import com.example.viewmodel.ScreenType
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 @Composable
 fun SceneSelectScreen(
@@ -223,8 +227,11 @@ fun SceneCard(
             )
     ) {
         // High quality scenery preview behind
-        Image(
-            painter = painterResource(id = bgImgRes),
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(bgImgRes)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build(),
             contentDescription = sceneType.displayName,
             contentScale = ContentScale.Crop,
             modifier = Modifier

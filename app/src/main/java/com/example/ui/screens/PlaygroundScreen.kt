@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import android.graphics.Bitmap
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -22,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +44,8 @@ import kotlinx.coroutines.delay
 import kotlin.random.Random
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 // Beautiful colors for playground UI details
 val SoftMint = Color(0xFF06D6A0)
@@ -55,8 +59,11 @@ fun AnimalImage(
     modifier: Modifier = Modifier
 ) {
     if (animal.imageResId != 0) {
-        Image(
-            painter = painterResource(id = animal.imageResId),
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(animal.imageResId)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build(),
             contentDescription = animal.name,
             modifier = modifier.size(size),
             contentScale = ContentScale.Fit
@@ -115,8 +122,11 @@ fun PlaygroundScreen(
         val maxHeight = maxHeight
 
         // 1. Fullscreen picture-book scenery illustration background
-        Image(
-            painter = painterResource(id = bgDrawableRes),
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(bgDrawableRes)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build(),
             contentDescription = scene.displayName,
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize()

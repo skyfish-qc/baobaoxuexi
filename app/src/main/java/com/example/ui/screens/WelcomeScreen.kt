@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import android.graphics.Bitmap
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +31,8 @@ import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.viewmodel.LearningViewModel
 import com.example.viewmodel.ScreenType
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 // Playful child color palette
 val SoapYellow = Color(0xFFFFF9E6)
@@ -112,8 +116,11 @@ fun WelcomeScreen(
                         .border(6.dp, SunshineYellow, CircleShape)
                         .shadow(8.dp, CircleShape)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.img_app_icon),
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(R.drawable.img_app_icon)
+                            .bitmapConfig(Bitmap.Config.RGB_565)
+                            .build(),
                         contentDescription = "App Icon Logo",
                         modifier = Modifier
                             .fillMaxSize()
